@@ -13,6 +13,12 @@ You will also need a working version of Ruby to use the build tools
 for this project.
 
 
+## Usage
+
+Once everything is installed, you can build and run stegasaurus:
+
+    rake build
+    ./stegasaurus -m "My secret message" picture.gif
 
 
 ## Copyright
