@@ -1,3 +1,0 @@
-[submodule "vendor/giflib"]
-	path = vendor/giflib
-	url = https://github.com/Distrotech/giflib
