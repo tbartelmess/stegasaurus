@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <fcntl.h>
 #include <getopt.h>
 #include <gif_lib.h>
 
@@ -25,6 +26,18 @@ usage(char** argv)
 }
 
 
+static
+void
+handle_error(int error)
+{
+  if (error == GIF_ERROR) {
+    char* message = GifErrorString(error);
+    printf("ERROR: %s\n", message);
+    exit(1);
+  }
+}
+
+
 int
 main(int argc, char** argv)
 {
@@ -38,8 +51,8 @@ main(int argc, char** argv)
   };
 
   char* message = NULL;
-  char* input   = NULL;
-  char* output  = NULL;
+  int input_fd  = 0;
+  int output_fd = 0;
 
   int getopt_result = 0;
   while ((getopt_result = getopt_long(argc, argv, "mio:", options, NULL)) != -1)
@@ -49,21 +62,37 @@ main(int argc, char** argv)
 	message = optarg;
 	break;
       case 'i':
-	input = optarg;
+	input_fd = open(optarg, O_RDONLY);
+	if (input_fd == -1) {
+	  perror("Failed to open input file");
+	  exit(1);
+	}
 	break;
       case 'o':
-	output = optarg;
+	output_fd = open(optarg, O_WRONLY|O_CREAT|O_TRUNC, 0644);
+	if (output_fd == -1) {
+	  perror("Failed to open output file");
+	  exit(1);
+	}
 	break;
       default:
 	usage(argv);
       }
 
-  if (!(message && input && output))
+  if (!(message && input_fd && output_fd))
     usage(argv);
 
-  printf("Message:         %s\n", message);
-  printf("Input GIF:       %s\n", input);
-  printf("Stegasaurus GIF: %s\n", output);
+  int error = 0;
+  GifFileType* image = DGifOpenFileHandle(input_fd, &error);
+  if (!image) handle_error(error);
+
+  handle_error(DGifSlurp(image));
+
+  // TODO refactor
+  // cleanup
+  handle_error(DGifCloseFile(image));
+  close(input_fd);
+  close(output_fd);
 
   return 0;
 }
