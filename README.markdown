@@ -18,7 +18,7 @@ for this project.
 Once everything is installed, you can build and run stegasaurus:
 
     rake build
-    ./stegasaurus -m "My secret message" picture.gif
+    ./stegasaurus --message "My secret message" --input input.gif --output output.gif
 
 
 ## Copyright
