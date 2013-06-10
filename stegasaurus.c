@@ -82,16 +82,45 @@ main(int argc, char** argv)
   if (!(message && input_fd && output_fd))
     usage(argv);
 
+
+  // GET THE PARTY STARTED HERE
+
+
   int error = 0;
   GifFileType* image = DGifOpenFileHandle(input_fd, &error);
   if (!image) handle_error(error);
 
+
   handle_error(DGifSlurp(image));
+
+
+
+  GifFileType* stegasaurus = EGifOpenFileHandle(output_fd, &error);
+  if (!stegasaurus) handle_error(error);
+
+  stegasaurus->SWidth  = image->SWidth;
+  stegasaurus->SHeight = image->SHeight;
+  stegasaurus->SColorResolution = image->SColorResolution;
+  stegasaurus->SBackGroundColor = image->SBackGroundColor;
+  stegasaurus->SColorMap = GifMakeMapObject(image->SColorMap->ColorCount,
+					    image->SColorMap->Colors);
+
+  for (int i = 0; i < image->ImageCount; i++)
+    GifMakeSavedImage(stegasaurus, &image->SavedImages[i]);
+
+  if (EGifSpew(stegasaurus) == GIF_ERROR)
+    printf("fuuuu\n");
 
   // TODO refactor
   // cleanup
-  handle_error(DGifCloseFile(image));
+  if (DGifCloseFile(image) == GIF_ERROR)
+    printf("error that we don't care about much\n");
   close(input_fd);
+
+  if (EGifCloseFile(stegasaurus) == GIF_ERROR) {
+    printf("error that might cause problems later: %s\n",
+	   GifErrorString(stegasaurus->Error));
+  }
   close(output_fd);
 
   return 0;
