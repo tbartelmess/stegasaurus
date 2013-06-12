@@ -106,7 +106,7 @@ main(int argc, char** argv)
 					    image->SColorMap->Colors);
 
   for (int i = 0; i < image->ImageCount; i++) {
-    // split the message up evenly amongst the images
+    // @todo split the message up evenly amongst the images
     //
     GifMakeSavedImage(stegasaurus, &image->SavedImages[i]);
     for (int j = 0; j < 100; j++) {
