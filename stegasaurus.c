@@ -105,8 +105,15 @@ main(int argc, char** argv)
   stegasaurus->SColorMap = GifMakeMapObject(image->SColorMap->ColorCount,
 					    image->SColorMap->Colors);
 
-  for (int i = 0; i < image->ImageCount; i++)
+  for (int i = 0; i < image->ImageCount; i++) {
+    // split the message up evenly amongst the images
+    //
     GifMakeSavedImage(stegasaurus, &image->SavedImages[i]);
+    for (int j = 0; j < 100; j++) {
+      stegasaurus->SavedImages[i].RasterBits[j] =
+	stegasaurus->SavedImages[i].RasterBits[j] | 0xff;
+    }
+  }
 
   if (EGifSpew(stegasaurus) == GIF_ERROR)
     printf("fuuuu\n");
