@@ -72,7 +72,7 @@ encode_message(const char* message, GifFileType* image)
    * get out again later... ;)
    */
 
-  size_t message_length = strlen(message);
+//  size_t message_length = strlen(message);
 
   return GIF_OK;
 }
