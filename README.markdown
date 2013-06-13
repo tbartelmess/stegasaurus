@@ -18,7 +18,11 @@ for this project.
 Once everything is installed, you can build and run stegasaurus:
 
     rake build
-    ./stegasaurus --message "My secret message" --input input.gif --output output.gif
+    ./stegasaurus --message "My secret message" <input.gif >output.gif
+
+And thus you have your message encoded into your image. Code for
+retreiving the message from the images has purposely not been
+published at this time.
 
 
 ## Copyright
