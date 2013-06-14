@@ -5,7 +5,7 @@ CLEAN.include 'stegasaurus'
 
 CC     = 'clang'
 CXX    = 'clang++'
-CFLAGS = '-Wall -Werror -pedantic -O2'
+CFLAGS = '-Wall -Wextra -pedantic -O2'
 LIBS   = '-lgif'
 
 SRC = FileList['*.c']
