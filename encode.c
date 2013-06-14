@@ -78,6 +78,30 @@ encode_message(const char* message, GifFileType* image)
 }
 
 
+/**
+ * Prints the raw bit values of the image to stderr.
+ */
+void
+print_images(GifFileType* gif)
+{
+  for (int i = 0; i < gif->ImageCount; i++) {
+    fprintf(stderr, "\nImage %d:\n", i);
+    SavedImage image  = gif->SavedImages[i];
+    GifImageDesc desc = image.ImageDesc;
+
+    fprintf(stderr, "Top: %d; Left: %d; Height: %d; Width: %d\n",
+	    desc.Top, desc.Left, desc.Height, desc.Width);
+
+    for (int height = 0; height < desc.Height; height++) {
+      for (int width = 0; width < desc.Width; width++) {
+	fprintf(stderr, "%x", image.RasterBits[width]);
+      }
+      fprintf(stderr, "\n");
+    }
+  }
+}
+
+
 int
 stegasaurus_main(int argc, char** argv)
 {
@@ -110,7 +134,8 @@ stegasaurus_main(int argc, char** argv)
   copy_gif(input, output);
 
   // use some tricks to encode the given message into the output structure
-  encode_message(message, output);
+  //encode_message(message, output);
+  print_images(input);
 
   // write the output structure to file (standard out)
   if ((error = EGifSpew(output)) == GIF_ERROR) {
