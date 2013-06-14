@@ -84,6 +84,13 @@ encode_message(const char* message, GifFileType* image)
 void
 print_images(GifFileType* gif)
 {
+  if (gif->SColorMap) {
+    fprintf(stderr, "Bits per pixel: %d\n",
+	    gif->SColorMap->BitsPerPixel);
+  }
+
+  fprintf(stderr, "Total Images: %d\n", gif->ImageCount);
+
   for (int i = 0; i < gif->ImageCount; i++) {
     fprintf(stderr, "\nImage %d:\n", i);
     SavedImage image  = gif->SavedImages[i];
@@ -92,9 +99,15 @@ print_images(GifFileType* gif)
     fprintf(stderr, "Top: %d; Left: %d; Height: %d; Width: %d\n",
 	    desc.Top, desc.Left, desc.Height, desc.Width);
 
+    if (desc.ColorMap) {
+      fprintf(stderr, "Bits per pixel: %d\n",
+	      desc.ColorMap->BitsPerPixel);
+    }
+
     for (int height = 0; height < desc.Height; height++) {
+      int offset = height * desc.Width;
       for (int width = 0; width < desc.Width; width++) {
-	fprintf(stderr, "%x", image.RasterBits[width]);
+	fprintf(stderr, "%x", image.RasterBits[offset + width]);
       }
       fprintf(stderr, "\n");
     }
