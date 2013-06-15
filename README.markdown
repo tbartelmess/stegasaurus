@@ -31,8 +31,13 @@ The scheme that I created for encoding messages will not work if the
 image uses less than 8 bits per pixel or if the input text uses
 non-ASCII characters.
 
-The code base is purposely made somewhat obfuscated, because that just
-makes the game all the more fun. ;)
+Encoding may silently fail if the image does not have enough strong
+colouring, but this should not happen often in practice. Specifically,
+it depends on the RGB values of the image pixels, and how many of those
+values are greater than 128.
+
+The implementation has been somewhat obfuscated, and somewhat made
+obvious; I had a hard time deciding which made the game more fun. ;)
 
 
 ## Copyright
