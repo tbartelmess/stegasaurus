@@ -37,7 +37,7 @@ makes the game all the more fun. ;)
 
 ## Copyright
 
-Copyright (c) 2013, Mark Rada
+Copyright (c) 2013, Mark Rada.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
