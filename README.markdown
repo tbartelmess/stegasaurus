@@ -24,6 +24,9 @@ And thus you have your message encoded into your image. Code for
 retreiving the message from the images has purposely not been
 published at this time.
 
+The code base is purposely made somewhat obfuscated, because that just
+makes the game all the more fun. ;)
+
 
 ## Copyright
 
