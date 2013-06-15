@@ -6,6 +6,7 @@
 #include <fcntl.h>
 #include <getopt.h>
 #include <gif_lib.h>
+#include "scan_gif.h"
 
 // dirty global variables that getopt uses
 extern char *optarg;
@@ -64,35 +65,8 @@ copy_gif(GifFileType* from, GifFileType* to)
 }
 
 
-/**
- * Scan through each raster byte in a gif image and yield the value
- * to the function pointer. Think of this as a stream of bytes, with
- * no notion of image, coloumn, or row boundaries passed to the the
- * function pointer.
- *
- * Optionally pass a context that will be given to the handler.
- */
-void
-scan_gif(GifFileType* gif, void (*handler)(int, void*), void* ctx)
-{
-  assert(handler);
-
-  for (int i = 0; i < gif->ImageCount; i++) {
-    SavedImage image  = gif->SavedImages[i];
-    GifImageDesc desc = image.ImageDesc;
-
-    for (int height = 0; height < desc.Height; height++) {
-      int offset = height * desc.Width;
-      for (int width = 0; width < desc.Width; width++)
-	handler(image.RasterBits[offset + width], ctx);
-    }
-  }
-
-}
-
-
 int
-encode_message(const char* message, GifFileType* image)
+encode_message(const char* message, GifFileType* gif, int colour)
 {
   /**
    * The easy way of doing this would be to store the message into a GIF
@@ -100,11 +74,32 @@ encode_message(const char* message, GifFileType* image)
    * get out again later... ;)
    */
 
-  // Just put the information as an extension block
-  //extern int GifAddExtensionBlock(int *ExtensionBlock_Count,
-  //				ExtensionBlock **ExtensionBlocks,
-  //				int Function,
-  //				unsigned int Len, unsigned char ExtData[]);
+  int message_length = strlen(message);
+  int message_offset = 0;
+
+  for (int i = 0; i < gif->ImageCount; i++) {
+    SavedImage image  = gif->SavedImages[i];
+    GifImageDesc desc = image.ImageDesc;
+    int f = 0;
+
+    for (int height = 0; height < desc.Height; height++) {
+      int offset = height * desc.Width;
+      for (int width = 0; width < desc.Width; width++) {
+	int pixel = image.RasterBits[offset + width];
+	if (pixel == colour) {
+	  f++;
+	}
+	else if (f) {
+	  f = 0;
+	  image.RasterBits[offset + width] = message[message_offset];
+	  message_offset++;
+	  if (message_offset > message_length)
+	    return GIF_OK;
+	}
+      }
+    }
+  }
+
 
   return GIF_OK;
 }
@@ -147,47 +142,6 @@ print_images(GifFileType* gif)
 }
 
 
-static
-void
-pixel_counter(int pixel, void* ctx)
-{
-  int* context = (int*)ctx;
-  if (pixel == context[0]) {
-    context[1]++;
-  }
-  else if (context[1]) {
-    context[1] = 0;
-    context[2]++;
-  }
-}
-
-int
-analyze_images(GifFileType* gif, int colour)
-{
-  int ctx[3] = { colour, 0, 0 };
-  scan_gif(gif, pixel_counter, ctx);
-  return ctx[2];
-}
-
-
-void
-highest_colour(int pixel, void* ctx)
-{
-  int* context = (int*)ctx;
-  if (pixel > *context)
-    (*context)++;
-}
-
-
-int
-find_highest_colour(GifFileType* gif)
-{
-  int colour = 0;
-  scan_gif(gif, highest_colour, &colour);
-  return colour;
-}
-
-
 int
 stegasaurus_main(int argc, char** argv)
 {
@@ -219,14 +173,19 @@ stegasaurus_main(int argc, char** argv)
   // make the initial copy of the input image into the output structure
   copy_gif(input, output);
 
-  // use some tricks to encode the given message into the output structure
-  //encode_message(message, output);
   //print_images(input);
+
   int colour = find_highest_colour(input);
   fprintf(stderr, "The target colour is 0x%x\n", colour);
 
   int count = analyze_images(input, colour);
   fprintf(stderr, "There are %zd bytes available for encoding\n", count);
+
+  int message_length = strlen(message);
+  if (message_length > count)
+    fprintf(stderr, "ERROR: The message is too long for this image.\n");
+  else
+    encode_message(message, output, colour);
 
   // write the output structure to file (standard out)
   if ((error = EGifSpew(output)) == GIF_ERROR) {
