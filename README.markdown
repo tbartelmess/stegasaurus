@@ -24,6 +24,13 @@ And thus you have your message encoded into your image. Code for
 retreiving the message from the images has purposely not been
 published at this time.
 
+
+## Limitations
+
+The scheme that I created for encoding messages will not work if the
+image uses less than 8 bits per pixel or if the input text uses
+non-ASCII characters.
+
 The code base is purposely made somewhat obfuscated, because that just
 makes the game all the more fun. ;)
 

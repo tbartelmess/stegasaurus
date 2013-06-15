@@ -82,6 +82,12 @@ encode_message(const char* message, GifFileType* gif, int colour)
     GifImageDesc desc = image.ImageDesc;
     int f = 0;
 
+    if (desc.ColorMap && desc.ColorMap->BitsPerPixel < 8) {
+      fprintf(stderr, "WARN: image %d uses less than "
+	              "8 bits per pixel. Skipping...\n", i);
+      continue;
+    }
+
     for (int height = 0; height < desc.Height; height++) {
       int offset = height * desc.Width;
       for (int width = 0; width < desc.Width; width++) {
@@ -160,6 +166,12 @@ stegasaurus_main(int argc, char** argv)
   // read in the data for the input image
   if ((error = DGifSlurp(input)) == GIF_ERROR) {
     fprintf(stderr, "Input ERROR: %s\n", GifErrorString(error));
+    return 1;
+  }
+
+  if (input->SColorMap && input->SColorMap->BitsPerPixel < 8) {
+    fprintf(stderr, "ERROR: cannot encode messages onto image using less "
+	            "than 8 bits per pixel\n");
     return 1;
   }
 
