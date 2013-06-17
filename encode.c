@@ -84,7 +84,7 @@ encode_message(const char* message, GifFileType* gif, int colour)
 
     if (desc.ColorMap && desc.ColorMap->BitsPerPixel < 8) {
       fprintf(stderr, "WARN: image %d uses less than "
-	              "8 bits per pixel. Skipping...\n", i);
+	              "8 bit colour depth. Skipping...\n", i);
       continue;
     }
 

@@ -28,7 +28,7 @@ published at this time.
 ## Limitations
 
 The scheme that I created for encoding messages will not work if the
-image uses less than 8 bits per pixel or if the input text uses
+image uses less than 8 bits of colour depth or if the input text uses
 non-ASCII characters.
 
 Encoding may silently fail if the image does not have enough strong
