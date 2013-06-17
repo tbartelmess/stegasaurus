@@ -20,9 +20,9 @@ scan_gif(GifFileType* gif, void (*handler)(int, void*), void* ctx)
     GifImageDesc desc = image.ImageDesc;
 
     for (int height = 0; height < desc.Height; height++) {
-      int offset = height * desc.Width;
-      for (int width = 0; width < desc.Width; width++)
-	handler(image.RasterBits[offset + width], ctx);
+      int offset = height * desc.Width * 3; // 3 because R, G, and B
+      for (int width = 0; width < (desc.Width*3); width++)
+        handler(image.RasterBits[offset + width], ctx);
     }
   }
 

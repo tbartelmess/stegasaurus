@@ -89,19 +89,20 @@ encode_message(const char* message, GifFileType* gif, int colour)
     }
 
     for (int height = 0; height < desc.Height; height++) {
-      int offset = height * desc.Width;
-      for (int width = 0; width < desc.Width; width++) {
-	int pixel = image.RasterBits[offset + width];
-	if (pixel == colour) {
-	  f++;
-	}
-	else if (f) {
-	  f = 0;
-	  image.RasterBits[offset + width] = message[message_offset];
-	  message_offset++;
-	  if (message_offset > message_length)
-	    return GIF_OK;
-	}
+      int offset = height * desc.Width * 3; // 3 because R, G, and B
+
+      for (int width = 0; width < (desc.Width * 3); width++) {
+        int pixel = image.RasterBits[offset + width];
+        if (pixel == colour) {
+          f++;
+        }
+        else if (f) {
+          f = 0;
+          image.RasterBits[offset + width] = message[message_offset];
+          message_offset++;
+          if (message_offset > message_length)
+            return GIF_OK;
+        }
       }
     }
   }
@@ -188,7 +189,13 @@ stegasaurus_main(int argc, char** argv)
   //print_images(input);
 
   int colour = find_highest_colour(input);
-  fprintf(stderr, "The target colour is 0x%x\n", colour);
+  if (colour < 128) {
+    fprintf(stderr, "ERROR: No dark colours in the image. Aborting...\n");
+    return 1;
+  }
+  else {
+    fprintf(stderr, "The target colour is 0x%x\n", colour);
+  }
 
   int count = analyze_images(input, colour);
   fprintf(stderr, "There are %zd bytes available for encoding\n", count);
