@@ -89,9 +89,9 @@ encode_message(const char* message, GifFileType* gif, int colour)
     }
 
     for (int height = 0; height < desc.Height; height++) {
-      int offset = height * desc.Width * 3; // 3 because R, G, and B
+      int offset = height * desc.Width;
 
-      for (int width = 0; width < (desc.Width * 3); width++) {
+      for (int width = 0; width < desc.Width; width++) {
         int pixel = image.RasterBits[offset + width];
         if (pixel == colour) {
           f++;
