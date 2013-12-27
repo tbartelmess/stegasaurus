@@ -6,8 +6,9 @@ CLEAN.include 'unstegasaurus'
 
 CC     = 'clang'
 CXX    = 'clang++'
-CFLAGS = '-Wall -Wextra -pedantic -O0'
+CFLAGS = '-Wall -Wextra -pedantic -O0 -g'
 LIBS   = '-lgif'
+LDFLAGS= '-L/usr/local/opt/giflib5/lib'
 
 SRC = FileList['*.c']
 OBJ = SRC.ext('o')
@@ -21,9 +22,10 @@ rule '.o' => '.c' do |t|
 end
 
 file 'stegasaurus' => OBJ do
-  sh "#{CC} #{CFLAGS} -o stegasaurus #{LIBS} #{STEG_OBJ}"
+  sh "#{CC} #{CFLAGS} -o stegasaurus #{LIBS} #{LDFLAGS} #{STEG_OBJ}"
 end
 
 file 'unstegasaurus' => OBJ do
-  sh "#{CC} #{CFLAGS} -o unstegasaurus #{LIBS} #{UNSTEG_OBJ}"
+  sh "#{CC} #{CFLAGS} -o unstegasaurus #{LIBS} #{LDFLAGS} #{UNSTEG_OBJ}"
+  sh "dsymutil unstegasaurus -o unstegasaurus.dSYM"
 end
